@@ -6,6 +6,7 @@ const resolvers = {
     }
   },
   Mutation: {
+    // w server.js dekodujemy token, ale w loginUser ten token ustawiamy
     registerUser: async (parent, { username, password, passwordConfirm }, { User }) => {
       if (await User.findOne({ username })) return false;
       if (password !== passwordConfirm) return false;

@@ -11,13 +11,11 @@ const PORT = process.env.PORT || 4000;
 
 const app = express(); // dodajemy ewentualne middleware do app, ktore nastepnie z nimi wszystkimi uzywamy w applyMiddleware
 
-// JWT auth!
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => {
-
+    // auth logic - dekodowanie jwt ustawionego w headerze, wyszukanie usera w bazie na podstawie zdekodowanych danych. Jesli jest - req.user = znaleziony user jesli nie - null
     return { User }
   }
 })
@@ -30,3 +28,4 @@ app.listen({ port: PORT }, () => {
     })
     .catch(err => console.log(err))
 });
+// graphql na tym samym adresie - localhost:4000
