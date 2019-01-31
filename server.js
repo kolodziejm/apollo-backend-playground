@@ -2,11 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: 'variables.env' });
-const User = require('./models/User');
-
 const { ApolloServer } = require('apollo-server-express');
+
 const resolvers = require('./resolvers/index');
 const typeDefs = require('./schema');
+const User = require('./models/User');
+const Item = require('./models/Item');
 
 const PORT = process.env.PORT || 4000;
 
@@ -24,7 +25,7 @@ const server = new ApolloServer({
       currentUser = await User.findOne({ _id: decoded.id });
     }
 
-    return { User, currentUser }
+    return { User, Item, currentUser }
   }
 })
 server.applyMiddleware({ app });
