@@ -1,9 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: 'variables.env' });
 const User = require('./models/User');
 
-const { ApolloServer, AuthenticationError } = require('apollo-server-express');
+const { ApolloServer } = require('apollo-server-express');
 const resolvers = require('./resolvers/index');
 const typeDefs = require('./schema');
 
@@ -14,9 +15,16 @@ const app = express(); // dodajemy ewentualne middleware do app, ktore nastepnie
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
-    // auth logic - dekodowanie jwt ustawionego w headerze, wyszukanie usera w bazie na podstawie zdekodowanych danych. Jesli jest - req.user = znaleziony user jesli nie - null
-    return { User }
+  context: async ({ req }) => {
+    let currentUser = null;
+    const bearerToken = req.headers.authorization;
+    if (bearerToken) {
+      const token = bearerToken.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.SECRET);
+      currentUser = await User.findOne({ _id: decoded.id });
+    }
+
+    return { User, currentUser }
   }
 })
 server.applyMiddleware({ app });
